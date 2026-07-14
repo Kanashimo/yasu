@@ -5,6 +5,7 @@ gio = dependency('gio-2.0')
 libportal = dependency('libportal')
 gdk_pixbuf = dependency('gdk-pixbuf-2.0')
 gtk = dependency('gtk4')
+glfw = dependency('glfw3')
 
 sources = files(
     'src/main.cpp',
@@ -26,6 +27,7 @@ executable(
         gio,
         libportal,
         gdk_pixbuf,
-        gtk
+        gtk,
+        glfw
     ]
 )
