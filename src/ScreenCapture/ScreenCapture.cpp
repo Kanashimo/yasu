@@ -65,7 +65,7 @@ ScreenCapture::ScreenCapture() : portal(nullptr), loop(nullptr), error(nullptr),
         throw std::runtime_error(error_message);
     }
 
-    printf("🤨📸 caught in 4k");
+    printf("🤨📸 caught in 4k\n");
 }
 
 ScreenCapture::~ScreenCapture()
