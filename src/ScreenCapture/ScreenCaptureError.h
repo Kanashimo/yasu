@@ -1,5 +1,7 @@
 #pragma once
+
 #include "glib.h"
+
 
 #define SCREENCAPTURE_ERROR yasu_screencapture_error_quark()
 

@@ -1,12 +1,10 @@
 #pragma once
 
-#include <gio/gio.h>
-#include "gdk-pixbuf/gdk-pixbuf.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "libportal/portal-helpers.h"
-#include <string>
+#include <gtk/gtk.h>
+#include <libportal/portal.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <vector>
+#include <string>
 
 
 struct Monitor

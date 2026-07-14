@@ -1,5 +1,7 @@
-#include "ScreenCaptureError.h"
 #include "glib.h"
+
+#include "ScreenCaptureError.h"
+
 
 GQuark yasu_screencapture_error_quark()
 {

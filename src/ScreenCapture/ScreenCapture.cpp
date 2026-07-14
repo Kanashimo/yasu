@@ -1,21 +1,13 @@
-#include "ScreenCapture.h"
-#include "glib-object.h"
-#include "glibconfig.h"
-#include "ScreenCaptureError.h"
-#include <cstddef>
-#include <err.h>
-#include <error.h>
-#include <glib.h>
-#include <gio/gio.h>
-#include <libportal/portal-helpers.h>
-#include <libportal/screenshot.h>
-#include <stdexcept>
+#include <gtk/gtk.h>
 #include <libportal/portal.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
+#include <vector>
+#include <stdexcept>
 #include <string>
-#include "iostream"
+
+#include "ScreenCapture.h"
+#include "ScreenCaptureError.h"
+
 
 ScreenCapture::ScreenCapture() : portal(nullptr), loop(nullptr), error(nullptr), cancellable(nullptr)
 {
@@ -73,7 +65,7 @@ ScreenCapture::ScreenCapture() : portal(nullptr), loop(nullptr), error(nullptr),
         throw std::runtime_error(error_message);
     }
 
-    std::cout << "🤨📸 caught in 4k" << std::endl;
+    printf("🤨📸 caught in 4k");
 }
 
 ScreenCapture::~ScreenCapture()
