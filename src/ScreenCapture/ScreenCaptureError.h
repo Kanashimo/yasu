@@ -1,0 +1,15 @@
+#pragma once
+#include "glib.h"
+
+#define SCREENCAPTURE_ERROR yasu_screencapture_error_quark()
+
+enum ScreenCaptureError
+{
+    SCREENCAPTURE_ERROR_DISPLAY_SERVER_UNAVAILABLE,
+    SCREENCAPTURE_ERROR_MONITORS_UNAVAILABLE,
+    SCREENCAPTURE_ERROR_MONITOR_NOT_FOUND,
+    SCREENCAPTURE_ERROR_OUT_OF_BOUNDS,
+    SCREENCAPTURE_ERROR_SCREENSHOT_FAILED
+};
+
+GQuark yasu_screencapture_error_quark();
