@@ -77,9 +77,21 @@ ScreenCapture::~ScreenCapture()
     }
 }
 
-const std::vector<Monitor> &ScreenCapture::monitors() const
+const std::vector<Monitor> *ScreenCapture::monitors() const
 {
-    return _monitors;
+    return &_monitors;
+}
+
+const Monitor *ScreenCapture::get_monitor_from_pos(int x, int y) const
+{
+    for (const Monitor &monitor : _monitors)
+    {
+        if (monitor.x == x && monitor.y == y)
+        {
+            return &monitor;
+        }
+    }
+    return nullptr;
 }
 
 void ScreenCapture::callback(GObject *object, GAsyncResult *result, gpointer data)

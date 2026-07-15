@@ -26,7 +26,8 @@ class ScreenCapture
         ScreenCapture();
         ~ScreenCapture();
 
-        const std::vector<Monitor> &monitors() const;
+        const std::vector<Monitor> *monitors() const;
+        const Monitor *get_monitor_from_pos(int x, int y) const;
 
     private:
 
