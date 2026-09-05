@@ -6,6 +6,8 @@ libportal = dependency('libportal')
 gdk_pixbuf = dependency('gdk-pixbuf-2.0')
 gtk = dependency('gtk4')
 glfw = dependency('glfw3')
+imgui = dependency('imgui')
+gl = dependency('gl')
 
 sources = files(
     'src/main.cpp',
@@ -28,6 +30,8 @@ executable(
         libportal,
         gdk_pixbuf,
         gtk,
-        glfw
+        glfw,
+        imgui,
+        gl
     ]
 )

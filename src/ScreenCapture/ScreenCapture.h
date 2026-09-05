@@ -12,6 +12,9 @@ struct Monitor
     uint id;
     std::string connector;
     guchar *framebuffer;
+    int stride;
+    int channels;
+    bool alpha;
     int width;
     int height;
     int x;
@@ -26,7 +29,7 @@ class ScreenCapture
         ScreenCapture();
         ~ScreenCapture();
 
-        const std::vector<Monitor> *monitors() const;
+        const std::vector<Monitor> &monitors() const;
         const Monitor *get_monitor_from_pos(int x, int y) const;
 
     private:

@@ -77,9 +77,9 @@ ScreenCapture::~ScreenCapture()
     }
 }
 
-const std::vector<Monitor> *ScreenCapture::monitors() const
+const std::vector<Monitor> &ScreenCapture::monitors() const
 {
-    return &_monitors;
+    return _monitors;
 }
 
 const Monitor *ScreenCapture::get_monitor_from_pos(int x, int y) const
@@ -197,6 +197,9 @@ void ScreenCapture::process_screenshot(GdkPixbuf *pixbuf)
             monitor.id = i + 1;
             monitor.connector = connector;
             monitor.framebuffer = static_cast<guchar *>(g_memdup2(framebuffer, framebuffer_size));
+            monitor.stride = gdk_pixbuf_get_rowstride(pixbuf);
+            monitor.channels = gdk_pixbuf_get_n_channels(pixbuf);
+            monitor.alpha = gdk_pixbuf_get_has_alpha(pixbuf);
             monitor.width = rectangle.width;
             monitor.height = rectangle.height;
             monitor.x = rectangle.x;
