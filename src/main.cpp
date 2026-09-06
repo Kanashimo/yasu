@@ -1,14 +1,109 @@
 #include <GL/gl.h>
+#include <algorithm>
 #include <iostream>
-#include <string>
 #include <vector>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-
 #include "ScreenCapture/ScreenCapture.h"
+
+void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
+{
+    static ImVec2 start_pos;
+    static ImVec2 end_pos;
+    static bool dragging = false;
+    static GLFWwindow *targeted_window = nullptr;
+    ImVec2 pos = ImGui::GetMousePos();
+
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        start_pos = pos;
+        dragging = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+        targeted_window = window;
+    }
+
+    if (dragging && targeted_window == window)
+    {
+
+        ImVec2 r_min(
+            std::min(start_pos.x, pos.x),
+            std::min(start_pos.y, pos.y)
+        );
+
+        ImVec2 r_max(
+            std::max(start_pos.x, pos.x),
+            std::max(start_pos.y, pos.y)
+        );
+
+        float u0 = r_min.x / (float)monitor.width;
+        float u1 = r_max.x / (float)monitor.width;
+
+        float v0 = r_min.y / (float)monitor.height;
+        float v1 = r_max.y / (float)monitor.height;
+
+        ImGui::GetForegroundDrawList()->AddImage(
+            (ImTextureID)(intptr_t)texture,
+            r_min,
+            r_max,
+            ImVec2(u0, v0),
+            ImVec2(u1, v1)
+        );
+
+        ImDrawList* draw = ImGui::GetForegroundDrawList();
+
+        for (int i = 20; i >= 1; --i)
+        {
+            float alpha = 80.0f * (1.0f - (float)i / 20.0f);
+
+            draw->AddRect(
+                ImVec2(start_pos.x - i, start_pos.y - i),
+                ImVec2(pos.x + i, pos.y + i),
+                IM_COL32(90, 200, 255, (int)alpha),
+                0.0f,
+                0,
+                2.0f
+            );
+        }
+
+        ImGui::GetForegroundDrawList()->AddRect(
+            start_pos,
+            pos,
+            IM_COL32(90, 200, 255, 200),
+            0.0f,
+            0,
+            2.0f
+        );
+
+        end_pos = pos;
+    }
+
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        dragging = false;
+        targeted_window = nullptr;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
+
+
+        // int width  = std::abs((int)end_pos.x - (int)start_pos.x) + 1;
+        // int height = std::abs((int)end_pos.y - (int)start_pos.y) + 1;
+        // printf("%d %d\n", width, height);
+        // printf("ID; %d\n%.2f, %.2f\n%.2f, %.2f\n", monitor.id, start_pos.x ,start_pos.y, end_pos.x+1, end_pos.y+1);
+    }
+}
+
+void process_exit(bool &close)
+{
+    if (ImGui::IsKeyDown(ImGuiKey_Escape))
+    {
+        close = true;
+        printf("Exited gracefuly\n");
+    }
+}
 
 
 int main()
@@ -45,8 +140,11 @@ int main()
 
     for (int i = 0; i < n_glfw_monitors; i++)
     {
+
+        GLFWmonitor *glfw_monitor = glfw_monitors[i];
+
         int x, y;
-        glfwGetMonitorPos(glfw_monitors[i], &x, &y);
+        glfwGetMonitorPos(glfw_monitor, &x, &y);
         const Monitor *monitor = screenCapture.get_monitor_from_pos(x, y);
 
         if (!monitor)
@@ -57,15 +155,16 @@ int main()
 
         // std::cout << i + 1 << ": " << x << ", " << y << ", " << monitor->connector << std::endl;
 
+        const GLFWvidmode *mode = glfwGetVideoMode(glfw_monitor);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
         GLFWwindow *window = glfwCreateWindow(
             monitor->width,
             monitor->height,
             "yasu",
-            glfw_monitors[i],
+            glfw_monitor,
             nullptr
         );
-
-        // glfwSetWindowMonitor(window, glfw_monitors[i], 0, 0, monitor->width, monitor->height, GLFW_DONT_CARE);
 
         if (!window)
         {
@@ -96,6 +195,7 @@ int main()
 
             if (!initialized)
             {
+                glfwSwapInterval(0);
                 ImGuiContext *context = ImGui::CreateContext();
                 ImGui::SetCurrentContext(context);
                 ImGui::GetIO().IniFilename = nullptr;
@@ -144,20 +244,34 @@ int main()
             ImGui_ImplOpenGL3_NewFrame();
             ImGui::NewFrame();
 
+            static double begin_time = glfwGetTime();
+            double current_time = glfwGetTime() - begin_time;
 
             ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowSize(ImVec2(300, 150), ImGuiCond_FirstUseEver);
 
-            ImGui::Begin("Hello World");
-            ImGui::Text("Hello, World!");
-            ImGui::End();
-
-
-            ImGui::Begin("Screenshot");
-            ImGui::Image(
+            ImGui::GetBackgroundDrawList()->AddImage(
                 (ImTextureID)(intptr_t)texture[i],
-                ImVec2((float)monitor.width, (float)monitor.height));
-            ImGui::End();
+                ImVec2(0, 0),
+                ImVec2((float)monitor.width, (float)monitor.height)
+            );
+
+            float fade = (float)(current_time / 0.70f);
+            fade = std::clamp(fade, 0.0f, 0.40f);
+
+            ImGui::GetBackgroundDrawList()->AddRectFilled(
+                ImVec2(0, 0),
+                ImVec2((float)monitor.width, (float)monitor.height),
+                IM_COL32(0, 0, 0, (int)(fade * 255.0f))
+            );
+
+            // ImGui::Begin("Hello World");
+            // ImGui::Text("Hello, World!");
+            // ImGui::End();
+
+            process_drag(monitor, window, texture[i]);
+
+            process_exit(close);
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
