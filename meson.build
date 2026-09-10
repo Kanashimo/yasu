@@ -8,6 +8,7 @@ gtk = dependency('gtk4')
 glfw = dependency('glfw3')
 imgui = dependency('imgui')
 gl = dependency('gl')
+glew = dependency('glew')
 
 sources = files(
     'src/main.cpp',
@@ -32,6 +33,7 @@ executable(
         gtk,
         glfw,
         imgui,
-        gl
+        gl,
+        glew
     ]
 )
