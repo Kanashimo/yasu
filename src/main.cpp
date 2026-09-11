@@ -91,6 +91,24 @@ void process_exit(bool &close)
     }
 }
 
+void show_debug()
+{
+    static bool show = false;
+    if (ImGui::IsKeyPressed(ImGuiKey_F1))
+    {
+        show = !show;
+    }
+    if (show)
+    {
+        float fps = ImGui::GetIO().Framerate;
+        float frametime = 1000 / fps;
+        ImGui::Begin("debug");
+        ImGui::Text("fps: %.1f", fps);
+        ImGui::Text("frametime: %.1f", frametime);
+        ImGui::End();
+    }
+}
+
 
 int main()
 {
@@ -156,6 +174,18 @@ int main()
         {
             std::cerr << "Failed to create GLFW window" << std::endl;
             return -4;
+        }
+
+        glfwMakeContextCurrent(window);
+
+        glewExperimental = GL_TRUE;
+        GLenum glew = glewInit();
+
+        if (glew != GLEW_OK)
+        {
+            std::cerr << "Failed to initialize GLEW" << std::endl;
+            glfwTerminate();
+            return -5;
         }
 
         windows.push_back(window);
@@ -259,6 +289,8 @@ int main()
 
             process_exit(close);
 
+            show_debug();
+
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -272,6 +304,7 @@ int main()
 
     for (size_t i = 0; i < windows.size(); i++)
     {
+        // TODO: verify that it doesn't leak or something else
         glfwMakeContextCurrent(windows[i]);
         ImGui::SetCurrentContext(windowContext[i]);
         ImGui_ImplGlfw_Shutdown();
