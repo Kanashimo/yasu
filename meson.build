@@ -8,8 +8,10 @@ gtk = dependency('gtk4')
 glfw = dependency('glfw3')
 imgui = dependency('imgui')
 gl = dependency('gl')
-glew = dependency('glew')
-glu = dependency('glu')
+egl = dependency('egl')
+
+# force using wrap for glew dep instead of a system one
+glew = subproject('glew').get_variable('glew_dep')
 
 sources = files(
     'src/main.cpp',
@@ -38,6 +40,6 @@ executable(
         imgui,
         gl,
         glew,
-        glu
+        egl
     ]
 )
