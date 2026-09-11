@@ -6,7 +6,7 @@ libportal = dependency('libportal')
 gdk_pixbuf = dependency('gdk-pixbuf-2.0')
 gtk = dependency('gtk4')
 glfw = dependency('glfw3')
-imgui = dependency('imgui')
+imgui = dependency('imgui', version: '>=1.92.6')
 gl = dependency('gl')
 egl = dependency('egl')
 
