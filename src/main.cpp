@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <algorithm>
 #include <iostream>
@@ -8,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include "ScreenCapture/ScreenCapture.h"
+#include "ShaderLoader/ShaderLoader.h"
 
 void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
 {
@@ -52,22 +54,6 @@ void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
             ImVec2(u0, v0),
             ImVec2(u1, v1)
         );
-
-        ImDrawList* draw = ImGui::GetForegroundDrawList();
-
-        for (int i = 20; i >= 1; --i)
-        {
-            float alpha = 80.0f * (1.0f - (float)i / 20.0f);
-
-            draw->AddRect(
-                ImVec2(start_pos.x - i, start_pos.y - i),
-                ImVec2(pos.x + i, pos.y + i),
-                IM_COL32(90, 200, 255, (int)alpha),
-                0.0f,
-                0,
-                2.0f
-            );
-        }
 
         ImGui::GetForegroundDrawList()->AddRect(
             start_pos,

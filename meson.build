@@ -9,16 +9,19 @@ glfw = dependency('glfw3')
 imgui = dependency('imgui')
 gl = dependency('gl')
 glew = dependency('glew')
+glu = dependency('glu')
 
 sources = files(
     'src/main.cpp',
     'src/ScreenCapture/ScreenCapture.cpp',
-    'src/ScreenCapture/ScreenCaptureError.cpp'
+    'src/ScreenCapture/ScreenCaptureError.cpp',
+    'src/ShaderLoader/ShaderLoader.cpp'
 )
 
 headers = files(
     'src/ScreenCapture/ScreenCapture.h',
-    'src/ScreenCapture/ScreenCaptureError.h'
+    'src/ScreenCapture/ScreenCaptureError.h',
+    'src/ShaderLoader/ShaderLoader.h'
 )
 
 executable(
@@ -34,6 +37,7 @@ executable(
         glfw,
         imgui,
         gl,
-        glew
+        glew,
+        glu
     ]
 )
