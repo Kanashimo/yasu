@@ -1,5 +1,25 @@
 project('yasu', 'cpp')
 
+add_global_arguments(
+  '-DGLEW_NO_GLU',
+  language: 'c',
+)
+
+add_project_arguments(
+  '-DGLEW_NO_GLU',
+  language: 'cpp',
+)
+
+add_global_arguments(
+  '-DGLEW_EGL',
+  language: 'c',
+)
+
+add_project_arguments(
+  '-DGLEW_EGL',
+  language: 'cpp',
+)
+
 glib = dependency('glib-2.0')
 gio = dependency('gio-2.0')
 libportal = dependency('libportal')
