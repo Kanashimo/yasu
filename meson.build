@@ -46,6 +46,16 @@ headers = files(
     'src/ShaderLoader/ShaderLoader.h'
 )
 
+shaders = files(
+  'src/Shaders/glow.glsl'
+)
+
+fs = import('fs')
+
+foreach f : shaders
+  fs.copyfile(f)
+endforeach
+
 executable(
     'yasu',
     sources,
