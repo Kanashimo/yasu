@@ -1,3 +1,3 @@
 all:
 	meson compile -C build
-	./build/yasu
+	cd build && ./yasu
