@@ -1,7 +1,11 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <algorithm>
+#include <exception>
 #include <iostream>
+#include <memory>
+#include <ostream>
+#include <stdexcept>
 #include <vector>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -10,6 +14,39 @@
 
 #include "ScreenCapture/ScreenCapture.h"
 #include "ShaderLoader/ShaderLoader.h"
+
+// void load_shaders(bool &close, GLuint &program, GLuint &VAO, GLuint &VBO)
+// {
+//     try {
+//         ShaderSource box_src = ShaderLoader::load("box.glsl");
+//         ShaderSource glow_src = ShaderLoader::load("glow.glsl");
+//         Shader box = ShaderLoader::compile(GL_VERTEX_SHADER, box_src);
+//         Shader glow = ShaderLoader::compile(GL_FRAGMENT_SHADER, glow_src);
+//         ShaderLoader::attach(program, box);
+//         ShaderLoader::attach(program, glow);
+//         ShaderLoader::link(program);
+//         glDeleteShader(box);
+//         glDeleteShader(glow);
+//         glUseProgram(program);
+//         float vertices[] = {
+//             -0.5f, -0.5f, 0.0f,
+//              0.5f, -0.5f, 0.0f,
+//              0.0f,  0.5f, 0.0f
+//         };
+//         glGenVertexArrays(1, &VAO);
+//         glGenBuffers(1, &VBO);
+//         glBindVertexArray(VAO);
+//         glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+//         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//         glEnableVertexAttribArray(0); // Włączamy atrybut o indeksie 0
+//         glBindBuffer(GL_ARRAY_BUFFER, 0);
+//         glBindVertexArray(0);
+//     } catch (std::runtime_error &e) {
+//         close = true;
+//         std::cerr << e.what() << std::endl;
+//     }
+// }
 
 void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
 {
@@ -178,15 +215,15 @@ int main()
 
         glfwMakeContextCurrent(window);
 
-        glewExperimental = GL_TRUE;
-        GLenum glew = glewInit();
-
-        if (glew != GLEW_OK)
+        if (!ShaderLoader::init())
         {
-            std::cerr << "Failed to initialize GLEW" << std::endl;
+            std::cerr << ShaderLoader::glew_get_error() << std::endl;
             glfwTerminate();
-            return -5;
+            return -69;
         }
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         windows.push_back(window);
     }
@@ -196,6 +233,9 @@ int main()
 
     std::vector<ImGuiContext *> windowContext;
     std::vector<GLuint> texture(windows.size());
+    std::vector<std::unique_ptr<ShaderLoader>> program(windows.size());
+    std::vector<GLuint> arrays(windows.size()); // VAO
+    std::vector<GLuint> buffers(windows.size()); // VBO
 
     while (!close) {
 
@@ -243,6 +283,45 @@ int main()
                     monitor.framebuffer);
 
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
+                float points[6] = {
+                    -0.25f, -0.25f,
+                    0.f, 0.35f,
+                    0.25f, -0.25f
+                };
+
+                // VAO
+                GLuint array;
+                // VBO
+                GLuint buffer;
+
+                glGenVertexArrays(1, &array);
+                glBindVertexArray(array);
+                glGenBuffers(1, &buffer);
+                glBindBuffer(GL_ARRAY_BUFFER, buffer);
+                glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), points, GL_STATIC_DRAW);
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+                glBindVertexArray(0);
+
+                try {
+                    auto loader = std::make_unique<ShaderLoader>();
+                    loader->load(GL_VERTEX_SHADER, {
+                        "box.glsl"
+                    });
+                    loader->load(GL_FRAGMENT_SHADER, {
+                        "glow.glsl"
+                    });
+                    loader->compile();
+                    loader->use();
+                    // std::cout << array << buffer << std::endl;
+                    program[i] = std::move(loader);
+                    buffers[i] = buffer;
+                    arrays[i] = array;
+                } catch(std::runtime_error &e) {
+                    std::cerr << e.what() << std::endl;
+                }
+
             }
 
             ImGui::SetCurrentContext(windowContext[i]);
@@ -293,6 +372,14 @@ int main()
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            // BEGIN OPENGL
+            program[i]->use();
+            GLuint &array = arrays[i];
+            glBindVertexArray(array);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glBindVertexArray(0);
+            // END OPENGL
 
             glfwSwapBuffers(window);
 

@@ -47,6 +47,7 @@ headers = files(
 )
 
 shaders = files(
+  'src/Shaders/box.glsl',
   'src/Shaders/glow.glsl'
 )
 
