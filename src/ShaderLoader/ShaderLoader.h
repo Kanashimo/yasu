@@ -1,17 +1,49 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
+#include <initializer_list>
 #include <string>
+#include <GL/gl.h>
+#include <vector>
 
 typedef std::string ShaderSource;
 typedef GLuint Shader;
+typedef GLuint ShaderProgram;
+typedef GLint ShaderStatus;
+typedef GLenum GlewError;
+typedef GLenum ShaderType;
 
-namespace ShaderLoader
+struct ShaderResource {
+    ShaderSource source;
+    ShaderType type;
+    Shader shader;
+};
+
+class ShaderLoader
 {
-    ShaderSource load(const std::string& path);
-    Shader compile(GLenum type, ShaderSource src);
-    void attach(GLuint program, Shader shader);
-    void link(GLuint program);
-}
+    public:
+        ShaderLoader();
+        ~ShaderLoader();
+
+        ShaderLoader(const ShaderLoader&) = delete;
+        ShaderLoader &operator=(ShaderLoader&) = delete;
+
+        ShaderLoader(ShaderLoader&& other) noexcept;
+        ShaderLoader& operator=(ShaderLoader&& other) noexcept;
+
+        static bool init();
+        static std::string glew_get_error();
+
+        void load(ShaderType type, std::initializer_list<std::string> sources);
+        void use();
+        void compile();
+
+    private:
+        static GlewError glew_error;
+        static bool initialized;
+
+        ShaderProgram program;
+        std::vector<ShaderResource> shaders;
+
+        void link();
+        void cleanup_shaders();
+};
