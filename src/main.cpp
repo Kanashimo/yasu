@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <GL/glext.h>
 #include <algorithm>
-#include <exception>
 #include <iostream>
 #include <memory>
 #include <ostream>
@@ -48,7 +48,7 @@
 //     }
 // }
 
-void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
+void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &export_start_pos, ImVec2 &export_end_pos)
 {
     static ImVec2 start_pos;
     static ImVec2 end_pos;
@@ -101,6 +101,8 @@ void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture)
             2.0f
         );
 
+        export_start_pos = start_pos;
+        export_end_pos = pos;
         end_pos = pos;
     }
 
@@ -221,8 +223,7 @@ int main()
     std::vector<ImGuiContext *> windowContext;
     std::vector<GLuint> texture(windows.size());
     std::vector<std::unique_ptr<ShaderLoader>> program(windows.size());
-    std::vector<GLuint> arrays(windows.size()); // VAO
-    std::vector<GLuint> buffers(windows.size()); // VBO
+    std::vector<GLuint> arrays(windows.size());
 
     while (!close) {
 
@@ -271,44 +272,26 @@ int main()
 
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-                float points[6] = {
-                    -0.25f, -0.25f,
-                    0.f, 0.35f,
-                    0.25f, -0.25f
-                };
-
-                // VAO
                 GLuint array;
-                // VBO
-                GLuint buffer;
-
                 glGenVertexArrays(1, &array);
-                glBindVertexArray(array);
-                glGenBuffers(1, &buffer);
-                glBindBuffer(GL_ARRAY_BUFFER, buffer);
-                glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), points, GL_STATIC_DRAW);
-                glEnableVertexAttribArray(0);
-                glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-                glBindVertexArray(0);
 
                 try {
                     auto loader = std::make_unique<ShaderLoader>();
                     loader->load(GL_VERTEX_SHADER, {
-                        "box.glsl"
+                        "vert.glsl"
                     });
                     loader->load(GL_FRAGMENT_SHADER, {
-                        "glow.glsl"
+                        "frag.glsl"
                     });
                     loader->compile();
                     loader->use();
-                    // std::cout << array << buffer << std::endl;
                     program[i] = std::move(loader);
-                    buffers[i] = buffer;
                     arrays[i] = array;
                 } catch(std::runtime_error &e) {
                     std::cerr << e.what() << std::endl;
                 }
 
+                glUniform2f(glGetUniformLocation(program[i]->get(), "uScreenResolution"), (float)monitor.width, (float)monitor.height);
             }
 
             ImGui::SetCurrentContext(windowContext[i]);
@@ -351,7 +334,9 @@ int main()
             // ImGui::Text("Hello, World!");
             // ImGui::End();
 
-            process_drag(monitor, window, texture[i]);
+            ImVec2 start_pos, end_pos;
+
+            process_drag(monitor, window, texture[i], start_pos, end_pos);
 
             process_exit(close);
 
@@ -364,7 +349,11 @@ int main()
             program[i]->use();
             GLuint &array = arrays[i];
             glBindVertexArray(array);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            // glUniform2f(glGetUniformLocation(program[i]->get(), "uStartPoint"), 0.0f, 0.0f);
+            // glUniform2f(glGetUniformLocation(program[i]->get(), "uEndPoint"), 1920.0f, 1080.0f);
+            glUniform2f(glGetUniformLocation(program[i]->get(), "uStartPoint"), start_pos.x, start_pos.y);
+            glUniform2f(glGetUniformLocation(program[i]->get(), "uEndPoint"), end_pos.x, end_pos.y);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
             // END OPENGL
 
@@ -388,6 +377,7 @@ int main()
         glfwDestroyWindow(windows[i]);
     }
 
+    program.clear();
     windowContext.clear();
     windows.clear();
     glfwTerminate();

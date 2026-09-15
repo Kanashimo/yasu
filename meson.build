@@ -47,8 +47,8 @@ headers = files(
 )
 
 shaders = files(
-  'src/Shaders/box.glsl',
-  'src/Shaders/glow.glsl'
+  'src/Shaders/vert.glsl',
+  'src/Shaders/frag.glsl'
 )
 
 fs = import('fs')

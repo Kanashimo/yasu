@@ -27,15 +27,13 @@ class ShaderLoader
         ShaderLoader(const ShaderLoader&) = delete;
         ShaderLoader &operator=(ShaderLoader&) = delete;
 
-        ShaderLoader(ShaderLoader&& other) noexcept;
-        ShaderLoader& operator=(ShaderLoader&& other) noexcept;
-
         static bool init();
         static std::string glew_get_error();
 
         void load(ShaderType type, std::initializer_list<std::string> sources);
         void use();
         void compile();
+        ShaderProgram get();
 
     private:
         static GlewError glew_error;

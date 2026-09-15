@@ -144,6 +144,11 @@ void ShaderLoader::use()
     glUseProgram(program);
 }
 
+ShaderProgram ShaderLoader::get()
+{
+    return program;
+}
+
 ShaderLoader::~ShaderLoader()
 {
     std::cout << "shaderloader destroyed" << std::endl;
