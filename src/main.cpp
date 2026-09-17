@@ -15,44 +15,12 @@
 #include "ScreenCapture/ScreenCapture.h"
 #include "ShaderLoader/ShaderLoader.h"
 
-// void load_shaders(bool &close, GLuint &program, GLuint &VAO, GLuint &VBO)
-// {
-//     try {
-//         ShaderSource box_src = ShaderLoader::load("box.glsl");
-//         ShaderSource glow_src = ShaderLoader::load("glow.glsl");
-//         Shader box = ShaderLoader::compile(GL_VERTEX_SHADER, box_src);
-//         Shader glow = ShaderLoader::compile(GL_FRAGMENT_SHADER, glow_src);
-//         ShaderLoader::attach(program, box);
-//         ShaderLoader::attach(program, glow);
-//         ShaderLoader::link(program);
-//         glDeleteShader(box);
-//         glDeleteShader(glow);
-//         glUseProgram(program);
-//         float vertices[] = {
-//             -0.5f, -0.5f, 0.0f,
-//              0.5f, -0.5f, 0.0f,
-//              0.0f,  0.5f, 0.0f
-//         };
-//         glGenVertexArrays(1, &VAO);
-//         glGenBuffers(1, &VBO);
-//         glBindVertexArray(VAO);
-//         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-//         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//         glEnableVertexAttribArray(0); // Włączamy atrybut o indeksie 0
-//         glBindBuffer(GL_ARRAY_BUFFER, 0);
-//         glBindVertexArray(0);
-//     } catch (std::runtime_error &e) {
-//         close = true;
-//         std::cerr << e.what() << std::endl;
-//     }
-// }
-
-void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &export_start_pos, ImVec2 &export_end_pos)
+void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &export_start_pos, ImVec2 &export_end_pos, bool &export_dragging, float &export_drag_begin_time)
 {
     static ImVec2 start_pos;
     static ImVec2 end_pos;
     static bool dragging = false;
+    static float drag_begin_time = 0;
     static GLFWwindow *targeted_window = nullptr;
     ImVec2 pos = ImGui::GetMousePos();
 
@@ -63,6 +31,7 @@ void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &e
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
         targeted_window = window;
+        drag_begin_time = glfwGetTime();
     }
 
     if (dragging && targeted_window == window)
@@ -101,6 +70,7 @@ void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &e
             2.0f
         );
 
+        export_drag_begin_time = drag_begin_time;
         export_start_pos = start_pos;
         export_end_pos = pos;
         end_pos = pos;
@@ -119,6 +89,7 @@ void process_drag(Monitor monitor, GLFWwindow *window, GLuint texture, ImVec2 &e
         // printf("%d %d\n", width, height);
         // printf("ID; %d\n%.2f, %.2f\n%.2f, %.2f\n", monitor.id, start_pos.x ,start_pos.y, end_pos.x+1, end_pos.y+1);
     }
+    export_dragging = dragging;
 }
 
 void process_exit(bool &close)
@@ -283,6 +254,7 @@ int main()
                     loader->load(GL_FRAGMENT_SHADER, {
                         "frag.glsl"
                     });
+                    // TODO: fix segfault on comp err
                     loader->compile();
                     loader->use();
                     program[i] = std::move(loader);
@@ -335,8 +307,10 @@ int main()
             // ImGui::End();
 
             ImVec2 start_pos, end_pos;
+            float drag_begin_time = 0;
+            bool dragging;
 
-            process_drag(monitor, window, texture[i], start_pos, end_pos);
+            process_drag(monitor, window, texture[i], start_pos, end_pos, dragging, drag_begin_time);
 
             process_exit(close);
 
@@ -344,6 +318,21 @@ int main()
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            float strength = 0;
+            if (dragging)
+            {
+                // strength = (float)((glfwGetTime() - drag_begin_time) / 0.23f);
+                strength = (float)((glfwGetTime() - drag_begin_time) / 0.30f);
+                strength = std::clamp(strength, 0.0f, 1.0f);
+                strength = 1.0f - std::pow(1.0f - strength, 3.0f);
+            }
+
+            if (strength != 0)
+            {
+                std::cout << strength << std::endl;
+            }
+
 
             // BEGIN OPENGL
             program[i]->use();
@@ -353,7 +342,11 @@ int main()
             // glUniform2f(glGetUniformLocation(program[i]->get(), "uEndPoint"), 1920.0f, 1080.0f);
             glUniform2f(glGetUniformLocation(program[i]->get(), "uStartPoint"), start_pos.x, start_pos.y);
             glUniform2f(glGetUniformLocation(program[i]->get(), "uEndPoint"), end_pos.x, end_pos.y);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glUniform1f(glGetUniformLocation(program[i]->get(), "uStrength"), strength);
+            if (dragging)
+            {
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+            }
             glBindVertexArray(0);
             // END OPENGL
 

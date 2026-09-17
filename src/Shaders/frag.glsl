@@ -1,5 +1,8 @@
 #version 330
 
+uniform vec2 uScreenResolution;
+uniform float uStrength;
+
 in vec2 vPixelPosition;
 in vec2 vMaxPoint;
 in vec2 vMinPoint;
@@ -9,13 +12,18 @@ out vec4 FragColor;
 
 void main ()
 {
-    // TODO: polish it and use vPadding
+    // TODO: use vPadding, optimize everything
     vec2 closest = clamp(vPixelPosition, vMinPoint, vMaxPoint);
-    float d = distance(vPixelPosition, closest);
+    vec2 delta = vPixelPosition - closest;
+
+    delta.x *= uScreenResolution.x;
+    delta.y *= uScreenResolution.y;
+
+    float d = length(delta);
 
     if (d <= 0.0f) discard;
 
-    float glow = exp(-d * 200.0f);
+    float glow = uStrength * exp(-d * 0.075f);
 
     FragColor = vec4(0.35f, 0.8f, 1.0f, 0.5f) * glow;
 }
