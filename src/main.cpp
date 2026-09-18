@@ -323,7 +323,7 @@ int main()
             if (dragging)
             {
                 // strength = (float)((glfwGetTime() - drag_begin_time) / 0.23f);
-                strength = (float)((glfwGetTime() - drag_begin_time) / 0.30f);
+                strength = (float)((glfwGetTime() - drag_begin_time) / 0.50f);
                 strength = std::clamp(strength, 0.0f, 1.0f);
                 strength = 1.0f - std::pow(1.0f - strength, 3.0f);
             }
