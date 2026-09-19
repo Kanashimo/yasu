@@ -9,7 +9,7 @@
 
 struct Monitor
 {
-    uint id;
+    unsigned int id;
     std::string connector;
     guchar *framebuffer;
     int stride;
