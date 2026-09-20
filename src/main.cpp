@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "src/Application.h"
+#include "src/ErrorWindow.h"
 #include "src/UI/BackgroundTexture.h"
 #include "src/UI/Debug.h"
 #include "src/UI/Crop.h"
@@ -18,7 +19,9 @@ int main()
         app.run();
     } catch (std::runtime_error &e) {
         std::cerr << e.what() << std::endl;
+        ErrorWindow error(e.what());
         return 1;
     }
+
     return 0;
 }
