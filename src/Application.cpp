@@ -179,16 +179,25 @@ Application &Application::application()
 Application::~Application()
 {
     // TODO: verify that it doesn't leak or something else
-    // TODO: check if window and/or context is not nullptr
 
     for (auto &instance : instances) {
-        // glDeleteTextures(1, &instance.texture);
-        glfwMakeContextCurrent(instance.window);
-        ImGui::SetCurrentContext(instance.context);
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext(instance.context);
-        glfwDestroyWindow(instance.window);
+        if (instance.window != nullptr)
+        {
+            glfwMakeContextCurrent(instance.window);
+        }
+
+        if (instance.context != nullptr)
+        {
+            ImGui::SetCurrentContext(instance.context);
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext(instance.context);
+        }
+
+        if (instance.window != nullptr)
+        {
+            glfwDestroyWindow(instance.window);
+        }
     }
 
     instances.clear();
