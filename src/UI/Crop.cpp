@@ -11,6 +11,7 @@
 #include "src/ShaderLoader/ShaderLoader.h"
 #include "src/UI/Crop.h"
 #include "src/UI/BackgroundTexture.h"
+#include "src/UI/Exit.h"
 
 
 namespace UI {
@@ -55,6 +56,12 @@ namespace UI {
             texture = Application::application().module<BackgroundTexture>()->get_texture(instance);
             begin_time = glfwGetTime();
             strength = 0.0f;
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_Escape) && dragging)
+        {
+            Application::application().module<Exit>()->disable_exit();
+            stop_dragging(instance);
         }
 
         if (dragging && targeted_window == instance.window)
