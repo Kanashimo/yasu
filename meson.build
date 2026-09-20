@@ -37,6 +37,7 @@ sources = files(
 
 headers = files(
     'src/Application.h',
+    'src/ErrorWindow.h',
     'src/ScreenCapture/ScreenCapture.h',
     'src/ScreenCapture/ScreenCaptureError.h',
     'src/ShaderLoader/ShaderLoader.h',
