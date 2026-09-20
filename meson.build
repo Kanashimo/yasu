@@ -1,23 +1,15 @@
-project('yasu', 'cpp')
+project('yasu', 'cpp', default_options: ['cpp_std=c++20'])
 
 add_global_arguments(
   '-DGLEW_NO_GLU',
-  language: 'c',
+  '-DGLEW_EGL',
+  language: 'c'
 )
 
 add_project_arguments(
   '-DGLEW_NO_GLU',
-  language: 'cpp',
-)
-
-add_global_arguments(
-  '-DGLEW_EGL',
-  language: 'c',
-)
-
-add_project_arguments(
-  '-DGLEW_EGL',
-  language: 'cpp',
+   '-DGLEW_EGL',
+  language: 'cpp'
 )
 
 glib = dependency('glib-2.0')
@@ -35,15 +27,24 @@ glew = subproject('glew').get_variable('glew_dep')
 
 sources = files(
     'src/main.cpp',
+    'src/Application.cpp',
     'src/ScreenCapture/ScreenCapture.cpp',
     'src/ScreenCapture/ScreenCaptureError.cpp',
-    'src/ShaderLoader/ShaderLoader.cpp'
+    'src/ShaderLoader/ShaderLoader.cpp',
+    'src/UI/BackgroundTexture.cpp',
+    'src/UI/Crop.cpp'
 )
 
 headers = files(
+    'src/Application.h',
+    'src/test.h',
     'src/ScreenCapture/ScreenCapture.h',
     'src/ScreenCapture/ScreenCaptureError.h',
-    'src/ShaderLoader/ShaderLoader.h'
+    'src/ShaderLoader/ShaderLoader.h',
+    'src/UI/Exit.h',
+    'src/UI/Debug.h',
+    'src/UI/BackgroundTexture.h',
+    'src/UI/Crop.h'
 )
 
 shaders = files(
