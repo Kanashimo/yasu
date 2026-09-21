@@ -7,11 +7,13 @@
 #include "src/UI/Debug.h"
 #include "src/UI/Crop.h"
 #include "src/UI/Exit.h"
+#include "src/UI/Init.h"
 
 int main()
 {
     try {
         Application app;
+        app.attach<UI::Init>();
         app.attach<UI::Exit>();
         app.attach<UI::Debug>();
         app.attach<UI::BackgroundTexture>();
