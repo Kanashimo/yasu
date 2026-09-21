@@ -35,18 +35,6 @@ sources = files(
     'src/UI/Crop.cpp'
 )
 
-headers = files(
-    'src/Application.h',
-    'src/ErrorWindow.h',
-    'src/ScreenCapture/ScreenCapture.h',
-    'src/ScreenCapture/ScreenCaptureError.h',
-    'src/ShaderLoader/ShaderLoader.h',
-    'src/UI/Exit.h',
-    'src/UI/Debug.h',
-    'src/UI/BackgroundTexture.h',
-    'src/UI/Crop.h'
-)
-
 shaders = files(
   'src/Shaders/vert.glsl',
   'src/Shaders/frag.glsl'
@@ -61,7 +49,6 @@ endforeach
 executable(
     'yasu',
     sources,
-    headers,
     dependencies: [
         glib,
         gio,
