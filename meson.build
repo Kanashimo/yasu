@@ -32,7 +32,8 @@ sources = files(
     'src/ScreenCapture/ScreenCaptureError.cpp',
     'src/ShaderLoader/ShaderLoader.cpp',
     'src/UI/BackgroundTexture.cpp',
-    'src/UI/Crop.cpp'
+    'src/UI/Crop.cpp',
+    'src/UI/Toolbar.cpp'
 )
 
 shaders = files(
@@ -46,9 +47,39 @@ foreach f : shaders
   fs.copyfile(f)
 endforeach
 
+bash = find_program('bash', required: true)
+
+find_program('xxd', required: true)
+find_program('sed', required: true)
+
+## VERY VERY VERY VERY TEMPORARY SOLUTION, I DON'T HAVE TIME FOR THIS
+roboto_regular = custom_target(
+  'build_fonts1',
+  input: 'src/Fonts/Roboto-Regular.ttf',
+  output: 'Roboto_Regular.h',
+  command: [bash, files('tools/build_font.sh'), '@INPUT@', '@OUTPUT@'],
+)
+
+roboto_bold = custom_target(
+  'build_fonts2',
+  input: 'src/Fonts/Roboto-Bold.ttf',
+  output: 'Roboto_Bold.h',
+  command: [bash, files('tools/build_font.sh'), '@INPUT@', '@OUTPUT@'],
+)
+
+roboto_light = custom_target(
+  'build_fonts3',
+  input: 'src/Fonts/Roboto-Light.ttf',
+  output: 'Roboto_Light.h',
+  command: [bash, files('tools/build_font.sh'), '@INPUT@', '@OUTPUT@'],
+)
+
 executable(
     'yasu',
     sources,
+    roboto_regular,
+    roboto_bold,
+    roboto_light,
     dependencies: [
         glib,
         gio,
