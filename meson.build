@@ -74,6 +74,13 @@ roboto_light = custom_target(
   command: [bash, files('tools/build_font.sh'), '@INPUT@', '@OUTPUT@'],
 )
 
+roboto_light = custom_target(
+  'build_fonts4',
+  input: 'src/Fonts/Icons.ttf',
+  output: 'Icons.h',
+  command: [bash, files('tools/build_font.sh'), '@INPUT@', '@OUTPUT@'],
+)
+
 executable(
     'yasu',
     sources,

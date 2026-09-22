@@ -7,16 +7,18 @@
 #include "src/UI/Debug.h"
 #include "src/UI/Crop.h"
 #include "src/UI/Exit.h"
-#include "src/UI/Init.h"
+#include "src/UI/Toolbar.h"
+#include "src/UI/Fonts.h"
 
 int main()
 {
     try {
         Application app;
-        app.attach<UI::Init>();
+        app.attach<UI::Fonts>();
+        app.attach<UI::BackgroundTexture>();
+        app.attach<UI::Toolbar>();
         app.attach<UI::Exit>();
         app.attach<UI::Debug>();
-        app.attach<UI::BackgroundTexture>();
         app.attach<UI::Crop>();
         app.run();
     } catch (std::runtime_error &e) {

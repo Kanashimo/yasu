@@ -6,6 +6,8 @@
 #include <cmath>
 #include <memory>
 #include <stdexcept>
+#include "Toolbar.h"
+#include "iostream"
 
 #include "src/Application.h"
 #include "src/ShaderLoader/ShaderLoader.h"
@@ -43,9 +45,11 @@ namespace UI {
 
     void Crop::on_update(Instance &instance)
     {
+        if (Application::application().module<Toolbar>()->get_current_option() != OPTION_CROP) return;
+
         pos = ImGui::GetMousePos();
 
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !dragging)
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !dragging && !ImGui::GetIO().WantCaptureMouse)
         {
             start_pos = pos;
             dragging = true;
@@ -56,11 +60,13 @@ namespace UI {
             texture = Application::application().module<BackgroundTexture>()->get_texture(instance);
             begin_time = glfwGetTime();
             strength = 0.0f;
+            Application::application().module<Toolbar>()->set_busy(true);
         }
 
         if (ImGui::IsKeyDown(ImGuiKey_Escape) && dragging)
         {
             Application::application().module<Exit>()->disable_exit();
+            Application::application().module<Toolbar>()->set_busy(false);
             stop_dragging(instance);
         }
 
