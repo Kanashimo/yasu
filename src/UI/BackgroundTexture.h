@@ -3,6 +3,7 @@
 #include "src/Application.h"
 #include "src/Module.h"
 #include <unordered_map>
+#include "glbinding/gl/gl.h"
 
 namespace UI {
 
@@ -13,7 +14,7 @@ namespace UI {
             void on_instance_init(Instance &instance) override;
             void on_update(Instance &instance) override;
 
-            GLuint *get_texture(Instance &instance);
+            gl::GLuint *get_texture(Instance &instance);
 
             ~BackgroundTexture();
 
@@ -21,7 +22,7 @@ namespace UI {
             double begin_time = 0.0;
             float fade = 0.0f;
 
-            std::unordered_map<Instance*, GLuint> textures;
+            std::unordered_map<Instance*, gl::GLuint> textures;
     };
 
 }

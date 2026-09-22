@@ -1,8 +1,8 @@
 #pragma once
 
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <GL/gl.h>
 #include <memory>
 #include <unordered_map>
 
@@ -27,9 +27,9 @@ namespace UI {
 
             bool dragging;
             GLFWwindow* targeted_window;
-            GLuint *texture;
+            gl::GLuint *texture;
 
-            std::unordered_map<Instance*, GLuint> arrays;
+            std::unordered_map<Instance*, gl::GLuint> arrays;
             std::unordered_map<Instance*, std::unique_ptr<ShaderLoader>> programs;
 
             double begin_time;

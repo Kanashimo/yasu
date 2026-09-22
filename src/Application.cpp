@@ -1,6 +1,7 @@
 #include <memory>
 #include <stdexcept>
 #include <imgui.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -62,11 +63,11 @@ Application::Application() : monitors(screenCapture.monitors())
 
         if (!ShaderLoader::init())
         {
-            throw std::runtime_error(ShaderLoader::glew_get_error());
+            throw std::runtime_error(ShaderLoader::gl_get_error());
         }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl::glEnable(gl::GL_BLEND);
+        gl::glBlendFunc(gl::GL_SRC_ALPHA, gl::GL_ONE_MINUS_SRC_ALPHA);
 
         instance.window = window;
         instance.monitor = monitor;
@@ -106,8 +107,8 @@ void Application::run()
 
             ImGui::SetCurrentContext(instance.context);
 
-            glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            gl::glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+            gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
             ImGui_ImplGlfw_NewFrame();
             ImGui_ImplOpenGL3_NewFrame();
