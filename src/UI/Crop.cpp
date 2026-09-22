@@ -7,7 +7,6 @@
 #include <memory>
 #include <stdexcept>
 #include "Toolbar.h"
-#include "iostream"
 
 #include "src/Application.h"
 #include "src/ShaderLoader/ShaderLoader.h"
