@@ -1,4 +1,4 @@
-.PHONY: all debug
+.PHONY: all debug setup
 
 all:
 	meson compile -C build
@@ -7,3 +7,6 @@ all:
 debug:
 	meson compile -C build
 	cd build && gdb ./yasu
+
+setup:
+	meson setup build
