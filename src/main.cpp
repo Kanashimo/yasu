@@ -9,6 +9,7 @@
 #include "src/UI/Exit.h"
 #include "src/UI/Toolbar.h"
 #include "src/UI/Fonts.h"
+#include "src/UI/Pipette.h"
 
 int main()
 {
@@ -20,6 +21,7 @@ int main()
         app.attach<UI::Exit>();
         app.attach<UI::Debug>();
         app.attach<UI::Crop>();
+        app.attach<UI::Pipette>();
         app.run();
     } catch (std::runtime_error &e) {
         std::cerr << e.what() << std::endl;

@@ -23,7 +23,7 @@ namespace UI {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
         ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(90, 200, 255, 255));
+        // ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(90, 200, 255, 255));
 
         ImGuiWindowFlags window_flags = 0;
         window_flags |= ImGuiWindowFlags_NoResize;
@@ -63,17 +63,17 @@ namespace UI {
 
         render_button(OPTION_CROP, ICON_CROP, "Crop");
         ImGui::SameLine();
-        render_button(OPTION_RULER, ICON_RULER, "Ruler");
+        // render_button(OPTION_RULER, ICON_RULER, "Ruler");
         ImGui::SameLine();
         render_button(OPTION_PIPETTE, ICON_PIPETTE, "Pipette");
         ImGui::SameLine();
-        render_button(OPTION_SETTINGS, ICON_SETTINGS, "Settings");
+        // render_button(OPTION_SETTINGS, ICON_SETTINGS, "Settings");
 
         ImGui::End();
 
         ImGui::PopStyleVar();
         ImGui::PopStyleVar();
-        ImGui::PopStyleColor();
+        // ImGui::PopStyleColor();
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
 
