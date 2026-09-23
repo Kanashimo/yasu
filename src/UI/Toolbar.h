@@ -1,6 +1,7 @@
-#include "src/Module.h"
 #include <GLFW/glfw3.h>
 #include <unordered_map>
+
+#include "src/Module.h"
 
 namespace UI {
 

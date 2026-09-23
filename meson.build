@@ -1,14 +1,7 @@
 project('yasu', 'cpp', default_options: ['cpp_std=c++20'])
 
-add_global_arguments(
-  '-DGLEW_NO_GLU',
-  '-DGLEW_EGL',
-  language: 'c'
-)
-
 add_project_arguments(
-  '-DGLEW_NO_GLU',
-   '-DGLEW_EGL',
+  '-DGLFW_INCLUDE_NONE',
   language: 'cpp'
 )
 
@@ -19,11 +12,7 @@ gdk_pixbuf = dependency('gdk-pixbuf-2.0')
 gtk = dependency('gtk4')
 glfw = dependency('glfw3')
 imgui = dependency('imgui', version: '>=1.92.6')
-gl = dependency('gl')
-egl = dependency('egl')
-
-# force using wrap for glew dep instead of a system one
-glew = subproject('glew').get_variable('glew_dep')
+glbinding = dependency('glbinding')
 
 sources = files(
     'src/main.cpp',
@@ -95,8 +84,6 @@ executable(
         gtk,
         glfw,
         imgui,
-        gl,
-        glew,
-        egl
+        glbinding
     ]
 )

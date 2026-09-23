@@ -1,13 +1,11 @@
-#include "GL/glew.h"
-#include <GL/gl.h>
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <cmath>
 #include <memory>
 #include <stdexcept>
-#include "Toolbar.h"
 
+#include "src/UI/Toolbar.h"
 #include "src/Application.h"
 #include "src/ShaderLoader/ShaderLoader.h"
 #include "src/UI/Crop.h"
@@ -19,21 +17,21 @@ namespace UI {
 
     void Crop::on_instance_init(Instance &instance)
     {
-        GLuint array;
-        glGenVertexArrays(1, &array);
+        gl::GLuint array;
+        gl::glGenVertexArrays(1, &array);
         auto loader = std::make_unique<ShaderLoader>();
-        loader->load(GL_VERTEX_SHADER, {
+        loader->load(gl::GL_VERTEX_SHADER, {
             "vert.glsl",
         });
-        loader->load(GL_FRAGMENT_SHADER, {
+        loader->load(gl::GL_FRAGMENT_SHADER, {
             "frag.glsl"
         });
         // TODO: fix segfault on comp err
         loader->compile();
         loader->use();
 
-        glUniform2f(
-            glGetUniformLocation(loader->get(), "uScreenResolution"),
+        gl::glUniform2f(
+            gl::glGetUniformLocation(loader->get(), "uScreenResolution"),
             (float)instance.monitor->width,
             (float)instance.monitor->height
         );
@@ -126,29 +124,29 @@ namespace UI {
         }
 
         programs[&instance]->use();
-        GLuint &array = arrays[&instance];
+        gl::GLuint &array = arrays[&instance];
 
-        glBindVertexArray(array);
+        gl::glBindVertexArray(array);
 
-        glUniform2f(
-          glGetUniformLocation(programs[&instance]->get(), "uStartPoint"),
+        gl::glUniform2f(
+          gl::glGetUniformLocation(programs[&instance]->get(), "uStartPoint"),
           start_pos.x,
           start_pos.y
         );
 
-        glUniform2f(
-          glGetUniformLocation(programs[&instance]->get(), "uEndPoint"),
+        gl::glUniform2f(
+          gl::glGetUniformLocation(programs[&instance]->get(), "uEndPoint"),
           pos.x,
           pos.y
         );
 
-        glUniform1f(
-            glGetUniformLocation(programs[&instance]->get(), "uStrength"),
+        gl::glUniform1f(
+            gl::glGetUniformLocation(programs[&instance]->get(), "uStrength"),
             strength
         );
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        gl::glDrawArrays(gl::GL_TRIANGLES, 0, 6);
+        gl::glBindVertexArray(0);
     }
 
     Crop::~Crop()

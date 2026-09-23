@@ -1,4 +1,3 @@
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <algorithm>
@@ -15,30 +14,30 @@ namespace UI {
 
     void BackgroundTexture::on_instance_init(Instance &instance)
     {
-        GLuint texture;
+        gl::GLuint texture;
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        gl::glGenTextures(1, &texture);
+        gl::glBindTexture(gl::GL_TEXTURE_2D, texture);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl::glTexParameteri(gl::GL_TEXTURE_2D, gl::GL_TEXTURE_MIN_FILTER, gl::GL_LINEAR);
+        gl::glTexParameteri(gl::GL_TEXTURE_2D, gl::GL_TEXTURE_MAG_FILTER, gl::GL_LINEAR);
 
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, instance.monitor->stride / instance.monitor->channels);
+        gl::glPixelStorei(gl::GL_UNPACK_ALIGNMENT, 1);
+        gl::glPixelStorei(gl::GL_UNPACK_ROW_LENGTH, instance.monitor->stride / instance.monitor->channels);
 
-        glTexImage2D(
-            GL_TEXTURE_2D,
+        gl::glTexImage2D(
+            gl::GL_TEXTURE_2D,
             0,
-            instance.monitor->alpha ? GL_RGBA8 : GL_RGB8,
+            instance.monitor->alpha ? gl::GL_RGBA8 : gl::GL_RGB8,
             instance.monitor->width,
             instance.monitor->height,
             0,
-            instance.monitor->alpha ? GL_RGBA : GL_RGB,
-            GL_UNSIGNED_BYTE,
+            instance.monitor->alpha ? gl::GL_RGBA : gl::GL_RGB,
+            gl::GL_UNSIGNED_BYTE,
             instance.monitor->framebuffer
         );
 
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        gl::glPixelStorei(gl::GL_UNPACK_ROW_LENGTH, 0);
 
         textures[&instance] = texture;
     }
@@ -63,7 +62,7 @@ namespace UI {
         );
     }
 
-    GLuint *BackgroundTexture::get_texture(Instance &instance)
+    gl::GLuint *BackgroundTexture::get_texture(Instance &instance)
     {
         if (textures.contains(&instance))
         {
@@ -76,7 +75,7 @@ namespace UI {
     {
         for (const auto &[_, texture] : textures)
         {
-            glDeleteTextures(1, &texture);
+            gl::glDeleteTextures(1, &texture);
         }
     }
 

@@ -1,11 +1,12 @@
-#include "Toolbar.h"
-#include "imgui.h"
-#include "src/Application.h"
+#include <imgui.h>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
-#include "algorithm"
-#include "Fonts.h"
+#include <algorithm>
+
+#include "src/UI/Toolbar.h"
+#include "src/UI/Fonts.h"
+#include "src/Application.h"
 
 namespace UI {
 

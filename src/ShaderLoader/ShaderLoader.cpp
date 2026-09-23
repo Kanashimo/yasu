@@ -1,6 +1,4 @@
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
+#include <GLFW/glfw3.h>
 #include <utility>
 #include <initializer_list>
 #include <fstream>
@@ -11,19 +9,23 @@
 
 #include "ShaderLoader.h"
 
+#include "glbinding/gl/functions.h"
+#include "glbinding/gl/types.h"
+#include "glbinding/glbinding.h"
+#include <glbinding/gl/gl.h>
+
 bool ShaderLoader::initialized = false;
-GlewError ShaderLoader::glew_error = GLEW_OK;
+GLError ShaderLoader::gl_error = gl::GL_NO_ERROR;
 
 bool ShaderLoader::init()
 {
     if (initialized) return true;
 
-    glewExperimental = GL_TRUE;
-    GlewError glew = glewInit();
+    glbinding::initialize(glfwGetProcAddress);
 
-    if (glew != GLEW_OK)
+    if (gl::glGetError() != gl::GL_NO_ERROR)
     {
-        glew_error = glew;
+        gl_error = gl::glGetError();
         return false;
     }
 
@@ -31,15 +33,15 @@ bool ShaderLoader::init()
     return true;
 }
 
-std::string ShaderLoader::glew_get_error()
+std::string ShaderLoader::gl_get_error()
 {
-    return std::string(reinterpret_cast<const char*>(glewGetErrorString(glew_error)));
+    return std::to_string(static_cast<int>(gl_error));
 }
 
 ShaderLoader::ShaderLoader()
 {
     if (!initialized) throw std::runtime_error("Glew not initialized");
-    program = glCreateProgram();
+    program = gl::glCreateProgram();
 
     if (!program)
     {
@@ -73,7 +75,7 @@ void ShaderLoader::compile()
 {
     for (auto &shader_res : shaders)
     {
-        Shader shader = glCreateShader(shader_res.type);
+        Shader shader = gl::glCreateShader(shader_res.type);
 
         if (!shader) {
             cleanup_shaders();
@@ -81,27 +83,27 @@ void ShaderLoader::compile()
         }
 
         const char* src = shader_res.source.c_str();
-        glShaderSource(shader, 1, &src, nullptr);
-        glCompileShader(shader);
+        gl::glShaderSource(shader, 1, &src, nullptr);
+        gl::glCompileShader(shader);
 
         ShaderStatus succes;
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &succes);
+        gl::glGetShaderiv(shader, gl::GL_COMPILE_STATUS, &succes);
 
         if (!succes)
         {
-            GLint len = 0;
-            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+            gl::GLint len = 0;
+            gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &len);
             cleanup_shaders();
             if (len > 0)
             {
                 std::string log(len, '\0');
-                glGetShaderInfoLog(shader, len, &len, &log[0]);
+                gl::glGetShaderInfoLog(shader, len, &len, &log[0]);
                 throw std::runtime_error("Shader compilation error: " + log);
             }
             throw std::runtime_error("Shader compilation error (log is empty)");
         }
 
-        glAttachShader(program, shader);
+        gl::glAttachShader(program, shader);
         shader_res.shader = shader;
     }
     link();
@@ -110,20 +112,20 @@ void ShaderLoader::compile()
 
 void ShaderLoader::link()
 {
-    glLinkProgram(program);
+    gl::glLinkProgram(program);
 
     ShaderStatus success;
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &success);
 
     if (!success)
     {
-        GLint len = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        gl::GLint len = 0;
+        gl::glGetProgramiv(program, gl::GL_INFO_LOG_LENGTH, &len);
         cleanup_shaders();
         if (len > 0)
         {
             std::string log(len, '\0');
-            glGetProgramInfoLog(program, len, &len, &log[0]);
+            gl::glGetProgramInfoLog(program, len, &len, &log[0]);
             throw std::runtime_error("Program linking error: " + log);
         }
         throw std::runtime_error("Program linking error (log is empty)");
@@ -134,14 +136,14 @@ void ShaderLoader::cleanup_shaders()
 {
     for (auto &shader_res : shaders)
     {
-        if (shader_res.shader) glDeleteShader(shader_res.shader);
+        if (shader_res.shader) gl::glDeleteShader(shader_res.shader);
     }
     shaders.clear();
 }
 
 void ShaderLoader::use()
 {
-    glUseProgram(program);
+    gl::glUseProgram(program);
 }
 
 ShaderProgram ShaderLoader::get()
@@ -154,5 +156,5 @@ ShaderLoader::~ShaderLoader()
     std::cout << "shaderloader destroyed" << std::endl;
     if (!program) return;
     if (shaders.size() > 0) cleanup_shaders();
-    glDeleteProgram(program);
+    gl::glDeleteProgram(program);
 }

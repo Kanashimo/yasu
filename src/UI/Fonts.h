@@ -1,14 +1,13 @@
 #pragma once
 
+#include <imgui.h>
+#include <stdexcept>
+
 #include "src/Application.h"
 #include "src/Module.h"
-#include "imgui.h"
-#include <stdexcept>
 
 #include "Roboto_Regular.h"
 #include "Icons.h"
-
-
 
 #define ICON_RULER "\ue800"
 #define ICON_SETTINGS "\ue801"

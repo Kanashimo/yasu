@@ -1,16 +1,16 @@
 #pragma once
 
+#include <glbinding/gl/gl.h>
 #include <initializer_list>
 #include <string>
-#include <GL/gl.h>
 #include <vector>
 
 typedef std::string ShaderSource;
-typedef GLuint Shader;
-typedef GLuint ShaderProgram;
-typedef GLint ShaderStatus;
-typedef GLenum GlewError;
-typedef GLenum ShaderType;
+typedef gl::GLuint Shader;
+typedef gl::GLuint ShaderProgram;
+typedef gl::GLint ShaderStatus;
+typedef gl::GLenum GLError;
+typedef gl::GLenum ShaderType;
 
 struct ShaderResource {
     ShaderSource source;
@@ -28,7 +28,7 @@ class ShaderLoader
         ShaderLoader &operator=(ShaderLoader&) = delete;
 
         static bool init();
-        static std::string glew_get_error();
+        static std::string gl_get_error();
 
         void load(ShaderType type, std::initializer_list<std::string> sources);
         void use();
@@ -36,7 +36,7 @@ class ShaderLoader
         ShaderProgram get();
 
     private:
-        static GlewError glew_error;
+        static GLError gl_error;
         static bool initialized;
 
         ShaderProgram program;
